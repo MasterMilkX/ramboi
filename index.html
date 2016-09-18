@@ -1,0 +1,22 @@
+<html>
+  <head>
+    <title>ramboi</title>
+    <link rel="stylesheet" type="text/css" href="styles.css">
+  </head>
+  <body>
+    <img src="sprites/ramboi_title.png" height="36">
+    <div id="settings">
+      <select id="control" onchange="changeControl()">
+        <option value="ai">AI</option>
+        <option value="user">User</option>
+      </select>
+      <button onclick="canRunRams = true;">GO</button>>&nbsp;
+      <button onclick="resetLevel(0*32,0*32);">RESET</button>
+      <button onclick="randomMap();">RANDOM</button>
+      <button onclick="nextLevel('Default');">DEFAULT</button>
+      <button onclick="nextLevel('Level 1');">LEVEL 1</button>
+      <p id="boiSettings">...</p>
+    </div>
+      <script src="code.js"></script>
+  </body>
+</html>
