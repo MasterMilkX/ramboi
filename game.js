@@ -1,6 +1,7 @@
 /*global Image*/
 /*global boi*/
 /*global levelList*/
+/*global canRunRams*/
 
 //set up the canvas
 var canvas = document.createElement("canvas");
@@ -85,7 +86,7 @@ var boi = {
   velX : 0,
   velY : 0,
   friction: 0.85,
-  jump: -7.75,
+  jump: -7,
   //properties
   width : 32,
   height : 32,
@@ -116,7 +117,14 @@ var canJump = false;
 
 //controls
 var control = "ai";
-
+function changeControl(){
+  control = document.getElementById("control").value;
+  canRunRams = false;
+}
+var keys = [];
+var jumpKey = 38; //[Up]
+var leftKey = 37;
+var rightKey = 39;
 
 //////////////////////////////////////////      FUNCTIONS     //////////////////////////////////////
 
@@ -325,7 +333,31 @@ function touching(sprite1, sprite2){
   
 }
 
-//////////////////key events/////////////
+//////////////////key events////////////////////
+
+function keyboard(){
+  if(control == "user"){
+    console.log("user control!");
+    if(keys[rightKey]){
+      boi.dir = "right";
+      boi.action = "run";
+      if (boi.velX < boi.speed)
+        boi.velX+= boi.friction;
+      
+    }else if(keys[leftKey]){
+      boi.dir = "left";
+      boi.action = "run";
+      if (boi.velX > -boi.speed)
+        boi.velX-= boi.friction;
+    }else{
+      boi.action = "idle";
+    }
+    
+    move();
+    
+  }
+  requestAnimationFrame(keyboard);
+}
 
 function moveRight(){
     boi.dir = "right";
@@ -402,8 +434,16 @@ function move(){
   
   //requestAnimationFrame(move);
 }
-function jump(){
+function jumpAI(){
   if(canJump){
+    canJump = false;
+    jumped = true;
+    boi.velY += boi.jump;
+    //console.log("hop you bastard!");
+  }
+}
+function jumpUser(e){
+  if(e.keyCode == jumpKey && canJump){
     canJump = false;
     jumped = true;
     boi.velY += boi.jump;
@@ -475,24 +515,121 @@ function hitHead(){
 }
 
 
+///////////////////////AI CONTROLS////////////////////
+
+//move to the right
+function moveRight(){
+    boi.dir = "right";
+    boi.action = "run";
+    if (boi.velX < boi.speed)
+      boi.velX+= boi.friction;
+      
+    move();
+}
+
+//move to the left
+function moveLeft(){
+    boi.dir = "left";
+    boi.action = "run";
+    if (boi.velX > -boi.speed)
+      boi.velX-= boi.friction;
+          
+    move();
+}
+
+//dont move
+function idle(){
+    boi.action = "idle";
+}
+
+//wait idlely for a set time
+function wait(sec, f){
+  window.setTimeout(f, (sec*1000));
+}
+
+//main AI execution
+var canRunRams = false;
+function goRams(){
+    if(control == "ai"){
+        console.log("ai control!");
+        if(canRunRams){
+            if(boi.dir == "right")
+                moveRight();
+            else
+                moveLeft();
+        
+            if(foundPit() || foundWall()){
+                jumpAI();
+            }
+            
+            if(pixX == map[0].length - 1){
+                boi.dir = "left";
+            }else if(pixX == 0){
+                boi.dir = "right";
+            }
+            
+            
+        }else{
+            idle();
+            move();
+        }
+        //requestAnimationFrame(move)
+        
+    }
+    requestAnimationFrame(goRams);
+}
+goRams();
+
+
+//decision making area
+
+//check if next block is a pit
+function foundPit(){
+    if(tilesReady){
+        var nextTileX = pixX + (boi.dir == "left" ? -1 : 1);
+        var nextTileY = (pixY + 1);
+        if(map[nextTileY][nextTileX] == 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+}
+//check if next block is a wall
+function foundWall(){
+    if(tilesReady){
+        var nextTileX = pixX + (boi.dir == "left" ? -1 : 1);
+        var nextTileY = pixY;
+        if(map[nextTileY][nextTileX] == 1){
+            return true;
+        }else{
+            return false;
+        }
+    }
+}
+
+
+/////////////////////UPDATE GAME FUNCTIONS///////////////////////
+
+
 //main updating function
 function main(){
   requestAnimationFrame(main);
   canvas.focus();
   
   // key events
-  /*
-  document.body.addEventListener("keydown", function (e) {
+  if(control == "user"){
+    document.body.addEventListener("keydown", function (e) {
       keys[e.keyCode] = true;
-  });
-  document.body.addEventListener("keyup", function (e) {
-      keys[e.keyCode] = false;
-      jumped = false;
-  });
-  document.body.addEventListener("keydown", jump);
-  */
+    });
+    document.body.addEventListener("keyup", function (e) {
+        keys[e.keyCode] = false;
+        jumped = false;
+    });
+    document.body.addEventListener("keydown", jumpUser);
+  }
   
-  
+
   //settings debugger screen
   var settings = "X: " + Math.round(boi.x) + " | Y: " + Math.round(boi.y);
   settings += " --- Vel X: " + Math.round(boi.velX) + " | Vel Y: " + Math.round(boi.velY);
@@ -517,8 +654,10 @@ nextLevel('Default');
 //LETS PLAY!
 main();
 render();
+keyboard();
 move();
 
+/*
 var canGo = false;
 var step = -1;
 
@@ -548,3 +687,4 @@ function gorams(){
 }
 
 //gorams();
+*/

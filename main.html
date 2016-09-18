@@ -1,16 +1,19 @@
 <html>
   <head>
-    <title>RAMBOI</title>
+    <title>ramboi</title>
     <link rel="stylesheet" type="text/css" href="styles.css">
   </head>
   <body>
-    <img src="sprites/ramboi_title.png" height="50">
+    <img src="sprites/ramboi_title.png" height="36">
     <div id="settings">
-      <select id="control"><option value="ai">AI</option><option value="user">User</option></select>
+      <select id="control" onchange="changeControl()">
+        <option value="ai">AI</option>
+        <option value="user">User</option>
+      </select>
       <button onclick="canRunRams = true;">GO</button>
       <p id="boiSettings">...</p>
     </div>
       <script src="game.js"></script>
-      <script src="boi_commands2.js"></script>
+      <!--<script src="boi_commands2.js"></script>-->
   </body>
 </html>
