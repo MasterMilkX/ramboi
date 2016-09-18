@@ -64,7 +64,9 @@ function levelDat(name, mapName, boiX, boiY){
 }
 
 var levelList = [
-    new levelDat("Default", "default", 1,3)
+    new levelDat("Default", "default", 1,3),
+    new levelDat("Level 1", "level1", 1,1)
+    
 ];
 
 //camera
@@ -189,6 +191,8 @@ function getLevel(e){
     reader.readAsText(levelTxt.files[0]);
   }
 }
+
+
 
 //draw the map
 function makeMap(level){
@@ -492,6 +496,12 @@ function colliding(axis){
         
       pixY = Math.floor(boi.y / 32);
       nextX = pixX + (boi.dir == "left" ? -1 : 1);  //left or right side
+      
+      if(pixY == -1 && (nextX == map[0].length || nextX == -1))
+        return true;
+      else if(pixY == -1)
+        return false;
+      
       if(map[pixY][nextX] !== 0){
         if(boi.dir == "right")
           colTileX = pixX * 32;
@@ -624,6 +634,24 @@ function foundWall(){
           return false;
         var nextTileY = pixY;
         if(map[nextTileY][nextTileX] == 1){
+            return true;
+        }else{
+            return false;
+        }
+    }
+}
+function foundDeadEnd(){
+  if(tilesReady){
+        var nextTileX = pixX + (boi.dir == "left" ? -1 : 1);
+        if(nextTileX <= 0 || nextTileX == map[0].length)
+          return false;
+        var nextTileY1 = (pixY - 2);
+        var nextTileY2 = (pixY - 1);
+        
+        if(nextTileY1 == -1 || nextTileY2 == -1)
+          return false;
+        
+        if(map[nextTileY1][nextTileX] == 1 && map[nextTileY2][nextTileX] == 1){
             return true;
         }else{
             return false;

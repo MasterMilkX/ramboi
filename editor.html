@@ -2,20 +2,68 @@
 <html>
   <head>
     <title>Map Maker</title>
+    <style>
+      #tiles{
+        border:1px solid black;
+        background:url(sprites/tiles32.png);
+      }
+      #editor{
+        width: 75%; 
+        overflow:scroll;
+        overflow-y: hidden;
+      }
+      #map{
+        border:1px solid black;
+      }
+      #tilePrev{
+        width: 32px;
+        height: 32px;
+        border: 1px solid black;
+      }
+      input[type="number"] {
+         width:50px;
+      }
+      img{
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    </style>
   </head>
   <body>
     <center>
       <h1>Map Maker</h1>
-      <div style="width: 75%; overflow:scroll;overflow-y: hidden;">
-          <canvas id="map" style="border:1px solid black">
+      <div id="editor">
+          <canvas id="map">
             Cannot show canvas on this browser. Use Chrome you n00b!
           </canvas>
       </div>
-        <div id="tileset">
-            Cols: <input type="number" id="cols" size="5" value="20" onchange="resetMap();">
-        </div>
-        <div >
-            <canvas id="tiles">super noob</canvas>
+        <br>
+        <table>
+          <tr>
+            <td colspan="2" align="center">
+              Cols: <input type="number" id="cols" value="20" onchange="resetMap();">
+            </td>
+          </tr>
+          <tr>
+            <td align="center">
+              <canvas id="tiles">super noob</canvas><br><br>
+              <canvas id="tilePrev"></canvas>
+            </td>
+            <td align="center">
+              <img src="sprites/ramboi_icon.png" width="64px"><br>
+              Position: <input type="text" value="0,0" size="5" id="pos" onchange="changeRam()">
+            </td>
+          </tr>
+          <tr>
+            <td align="center">Level Name: <input type="text" size="7" value="level1"/></td>
+            <td align="center"><button onclick="exportData()">Export</button>
+            <textarea rows="1" cols="4" id="leveldata"></textarea></td>
+          </tr>
+        </table>
+        <div>
+            
+            
         </div>
       <br>
     </center>
@@ -34,7 +82,7 @@
         bgImage.onload = function(){ bgReady = true; };
         bgImage.src = "sprites/background32.gif";
     
-    
+        //tiles
         var tileCanvas;
         var ttx;
         var tiles = new Image();
@@ -44,23 +92,33 @@
           tilesReady = true;
           tileCanvas = document.getElementById("tiles");
             ttx = tileCanvas.getContext("2d");
-            ttx.drawImage(tiles, 0, 0);
             tileCanvas.width = tiles.width;
             tileCanvas.height = tiles.height;
-            console.log("ok");
         };
-        
-        
         var curTile = 0;
       
-        var map = [];
+        //ramboi
+        var ramboiIMG = new Image();
+        var ramboiReady = false;
+        ramboiIMG.onload = function(){ramboiReady = true;};
+        ramboiIMG.src = "sprites/ramboi_icon.png";
+        if(ramboiReady)
+          ctx.drawImage(ramboiIMG, 0, 0);
+        var ramOP = [0,0];
+      
+        //map and functions
+        var map = []; 
         resetMap();
         function resetMap(){
             cols = document.getElementById("cols").value;
+            cols = parseInt(cols);
             canvas.width = cols * 32;
             map = new Array(rows);
             for(var a = 0; a < rows; a++){
                 map[a] = new Array(cols);
+                for(var i = 0; i < cols; i++){
+                  map[a][i] = 0;
+                }
             }
         }
       
@@ -80,14 +138,19 @@
           ctx.fillStyle = ptrn;
           ctx.fillRect(0, 0, canvas.width, canvas.height);
           
+          //draw the map elements
           drawMap();
+          
+          if(ramboiReady)
+            ctx.drawImage(ramboiIMG, ramOP[0] * 32, ramOP[1] * 32);
         }
       
         function main(){
             requestAnimationFrame(main);
             render();
             canvas.addEventListener("click", paint, false);
-            tileCanvas.addEventListener("click", pickTile, false);
+            if(tilesReady)
+              tileCanvas.addEventListener("click", pickTile, false);
         }
         main();
       
@@ -98,8 +161,7 @@
             var x = Math.floor(ev.offsetX / sf);  //for the cursor alignment 
             var y = Math.floor(ev.offsetY / sf);  //for the cursor alignment
         
-            ctx.fillStyle = "#000000";
-            ctx.fillRect(x * sf, y * sf, sf, sf);
+            map[y][x] = curTile;
         }
         function pickTile(ev2){
             var sf = canvas.width / (canvas.width / 32);
@@ -108,7 +170,23 @@
             var y = Math.floor(ev2.offsetY / sf);  //for the cursor alignment
         
             curTile = (x + y);
-            console.log("new tile: " + curTile);
+            var ptx = document.getElementById("tilePrev").getContext("2d");
+            ptx.clearRect(0,0,320,320);
+            ptx.drawImage(tiles, 32 * x, 32 * y, 32, 32, 0, 0, 320, 320);
+        }
+        
+        function changeRam(){
+          ctx.clearRect(ramOP[0] * 32, ramOP[1] * 32, 32, 32);
+          
+          var op = document.getElementById("pos").value;
+          ramOP = op.split(",");
+  
+        }
+        function exportData(){
+          var textar = document.getElementById("leveldata").value;
+          for(var a = 0; a < map.length; a++){
+            document.getElementById("leveldata").value += (map[a] + "\n");
+          }
         }
     </script>
   </body>
