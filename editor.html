@@ -1,0 +1,115 @@
+
+<html>
+  <head>
+    <title>Map Maker</title>
+  </head>
+  <body>
+    <center>
+      <h1>Map Maker</h1>
+      <div style="width: 75%; overflow:scroll;overflow-y: hidden;">
+          <canvas id="map" style="border:1px solid black">
+            Cannot show canvas on this browser. Use Chrome you n00b!
+          </canvas>
+      </div>
+        <div id="tileset">
+            Cols: <input type="number" id="cols" size="5" value="20" onchange="resetMap();">
+        </div>
+        <div >
+            <canvas id="tiles">super noob</canvas>
+        </div>
+      <br>
+    </center>
+    <script>
+        /*global Image*/
+        var canvas = document.getElementById("map");
+        var ctx = canvas.getContext("2d");
+        canvas.width = 640;
+        canvas.height = 320;
+        var rows = canvas.height / 32;
+        var cols = document.getElementById("cols").value;
+          
+        //background image
+        var bgReady = false;
+        var bgImage = new Image();
+        bgImage.onload = function(){ bgReady = true; };
+        bgImage.src = "sprites/background32.gif";
+    
+    
+        var tileCanvas;
+        var ttx;
+        var tiles = new Image();
+        tiles.src = "sprites/tiles32.png";
+        var tilesReady = false;
+        tiles.onload = function(){
+          tilesReady = true;
+          tileCanvas = document.getElementById("tiles");
+            ttx = tileCanvas.getContext("2d");
+            ttx.drawImage(tiles, 0, 0);
+            tileCanvas.width = tiles.width;
+            tileCanvas.height = tiles.height;
+            console.log("ok");
+        };
+        
+        
+        var curTile = 0;
+      
+        var map = [];
+        resetMap();
+        function resetMap(){
+            cols = document.getElementById("cols").value;
+            canvas.width = cols * 32;
+            map = new Array(rows);
+            for(var a = 0; a < rows; a++){
+                map[a] = new Array(cols);
+            }
+        }
+      
+        function drawMap(){
+          if(tilesReady){
+            for(var y = 0; y < rows; y++){
+              for(var x = 0; x < cols; x++){
+                ctx.drawImage(tiles, 32 * map[y][x], 0, 32, 32, (x * 32), (y * 32), 32, 32);
+              }
+            }
+          }
+        }
+      
+        function render(){
+          //re-draw bg
+          var ptrn = ctx.createPattern(bgImage, 'repeat'); // Create a pattern with this image, and set it to "repeat".
+          ctx.fillStyle = ptrn;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          drawMap();
+        }
+      
+        function main(){
+            requestAnimationFrame(main);
+            render();
+            canvas.addEventListener("click", paint, false);
+            tileCanvas.addEventListener("click", pickTile, false);
+        }
+        main();
+      
+        //editor method for painting on squares
+        function paint(ev){
+            var sf = canvas.width / (canvas.width / 32);
+        
+            var x = Math.floor(ev.offsetX / sf);  //for the cursor alignment 
+            var y = Math.floor(ev.offsetY / sf);  //for the cursor alignment
+        
+            ctx.fillStyle = "#000000";
+            ctx.fillRect(x * sf, y * sf, sf, sf);
+        }
+        function pickTile(ev2){
+            var sf = canvas.width / (canvas.width / 32);
+        
+            var x = Math.floor(ev2.offsetX / sf);  //for the cursor alignment 
+            var y = Math.floor(ev2.offsetY / sf);  //for the cursor alignment
+        
+            curTile = (x + y);
+            console.log("new tile: " + curTile);
+        }
+    </script>
+  </body>
+</html>
