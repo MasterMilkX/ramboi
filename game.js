@@ -114,6 +114,9 @@ var hasGravity = true;
 var jumped = false;
 var canJump = false;
 
+//controls
+var control = "ai";
+
 
 //////////////////////////////////////////      FUNCTIONS     //////////////////////////////////////
 
@@ -324,10 +327,6 @@ function touching(sprite1, sprite2){
 
 //////////////////key events/////////////
 
-function keyboard(){
-  move();
-  requestAnimationFrame(keyboard);
-}
 function moveRight(){
     boi.dir = "right";
     boi.action = "run";
@@ -400,6 +399,8 @@ function move(){
   if (boi.y > (canvas.height - 32)) {
       boi.y = canvas.height - 32;
   }
+  
+  //requestAnimationFrame(move);
 }
 function jump(){
   if(canJump){
@@ -516,7 +517,6 @@ nextLevel('Default');
 //LETS PLAY!
 main();
 render();
-keyboard();
 move();
 
 var canGo = false;
@@ -547,4 +547,4 @@ function gorams(){
   requestAnimationFrame(gorams);
 }
 
-gorams();
+//gorams();

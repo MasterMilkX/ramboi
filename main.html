@@ -6,10 +6,11 @@
   <body>
     <img src="sprites/ramboi_title.png" height="50">
     <div id="settings">
-      <button onclick="step = 0;">GO</button>
+      <select id="control"><option value="ai">AI</option><option value="user">User</option></select>
+      <button onclick="canRunRams = true;">GO</button>
       <p id="boiSettings">...</p>
     </div>
       <script src="game.js"></script>
-      <!--<script src="boi_commands.js"></script>-->
+      <script src="boi_commands2.js"></script>
   </body>
 </html>

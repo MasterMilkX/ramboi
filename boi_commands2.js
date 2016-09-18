@@ -40,20 +40,27 @@ function wait(sec, f){
 var canRunRams = false;
 function goRams(){
     if(canRunRams){
-        moveRight();
+        if(boi.dir == "right")
+            moveRight();
+        else
+            moveLeft();
     
-        if(foundPit()){
-            console.log("oh god!");
+        if(foundPit() || foundWall()){
             jump();
         }
         
-        if(pixX >= 7){
-            canRunRams = false;
+        if(pixX == map[0].length - 1){
+            boi.dir = "left";
+        }else if(pixX == 0){
+            boi.dir = "right";
         }
+        
+        
     }else{
         idle();
+        move();
     }
-    
+    //requestAnimationFrame(move)
     requestAnimationFrame(goRams);
 }
 goRams();
@@ -67,11 +74,22 @@ function foundPit(){
     if(tilesReady){
         var nextTileX = pixX + (boi.dir == "left" ? -1 : 1);
         var nextTileY = (pixY + 1);
-        if(map[nextTileX][nextTileY] == 0){
+        if(map[nextTileY][nextTileX] == 0){
             return true;
         }else{
             return false;
         }
     }
-    
+}
+//check if next block is a wall
+function foundWall(){
+    if(tilesReady){
+        var nextTileX = pixX + (boi.dir == "left" ? -1 : 1);
+        var nextTileY = pixY;
+        if(map[nextTileY][nextTileX] == 1){
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
